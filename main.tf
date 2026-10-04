@@ -138,4 +138,11 @@ resource "aws_mq_broker" "default" {
     username = local.mq_application_user
     password = local.mq_application_password
   }
+
+  # AWS doesn't return RabbitMQ users, and provider >= 6.38 no longer
+  # suppresses the diff, so brokers created earlier would get a CreateUser
+  # call (unsupported on RabbitMQ) and a reboot. Users are set only at create.
+  lifecycle {
+    ignore_changes = [user]
+  }
 }
